@@ -1,24 +1,25 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Task } from '@prisma/client';
+import { PrismaClient, Task } from '@prisma/client';
 import { UseCase } from '../../index';
-import SaveTaskDto from './SaveTaskDto';
+import UpdateTaskDto from './UpdateTaskDto';
 import TaskRepository from '../../Repositories/TaskRepository';
 
-
 @Injectable()
-export default class SaveTaskUseCase
-  implements UseCase<Promise<Task>, [dto: SaveTaskDto]>
+export default class UpdateTaskUseCase
+  implements UseCase<Promise<Task>, [id: number, dto: UpdateTaskDto]>
 {
   constructor(private readonly taskRepository: TaskRepository) {}
+  /* private prisma: PrismaClient;
 
+  constructor(private readonly taskRepository: TaskRepository) {
+    this.prisma = new PrismaClient();
+  }*/
   async handle(
-    dto: SaveTaskDto,
+    id: number,
+    dto: UpdateTaskDto,
   ): Promise<{ id: number; name: string; createdAt: Date; updatedAt: Date }> {
-    /*
-     * @todo IMPLEMENT HERE : VALIDATION DTO, DATA SAVING, ERROR CATCHING
-     */
     try {
-      const respones = await this.taskRepository.create(dto);
+      const respones = await this.taskRepository.update(id, dto);
       return respones;
     } catch (error) {
       throw new BadRequestException(error.message);
